@@ -96,3 +96,25 @@ class SecondAppFKToTestAppMigrationTest(MigrationTest):
         mymodelsecond = MyModelSecond()
         mymodelsecond.my_model = mymodelfirst
         mymodelsecond.save()
+
+
+class SecondAppFKToTestAppUsingPksMigrationTest(MigrationTest):
+    """Copy of SecondAppFKToTestAppMigrationTest but uses pks instead of
+    django's orm magic. Also have to declare in before and after the
+    migrations for all the models that are used.
+
+    """
+
+    before = [('test_app', '0005'), ('test_second_app', '0003')]
+    after = [('test_app', '0005'), ('test_second_app', '0003')]
+
+    def test_save_and_reload_model(self):
+        MyModelSecond = self.get_model_before('test_second_app.MyModel')
+        MyModelFirst = self.get_model_before('test_app.MyModel')
+
+        mymodelfirst = MyModelFirst()
+        mymodelfirst.save()
+
+        mymodelsecond = MyModelSecond()
+        mymodelsecond.my_model_id = mymodelfirst.pk
+        mymodelsecond.save()
